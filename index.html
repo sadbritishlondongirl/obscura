@@ -11,13 +11,13 @@
       padding: 0;
       height: 100%;
       font-family: 'Unica One', sans-serif;
-      color: #d1d1d1;
       background: #000;
       overflow: hidden;
+      cursor: none;
     }
 
     .background {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       height: 100%;
@@ -55,42 +55,35 @@
       pointer-events: none;
     }
 
-    .title, .subtitle, .features {
+    .glow-text {
       position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
-      z-index: 2;
-      animation: fadeInUp 3s ease-out;
+      color: rgba(255, 255, 255, 0);
+      mix-blend-mode: difference;
+      transition: opacity 1s ease;
+      pointer-events: none;
     }
 
     .title {
       top: 15%;
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 4rem;
-      color: #9f9f9f;
-      letter-spacing: 5px;
-      text-shadow: 0 0 20px #222, 0 0 40px #000;
     }
 
     .subtitle {
       top: 30%;
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 1.2rem;
-      color: #666;
-      text-shadow: 0 0 5px #000;
     }
 
     .features {
       top: 45%;
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 0.95rem;
-      color: #777;
       width: 90%;
       max-width: 700px;
-      text-align: left;
-      background-color: rgba(10, 10, 10, 0.4);
-      padding: 20px;
-      border: 1px solid #222;
-      border-radius: 10px;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
     }
 
     .features ul {
@@ -112,15 +105,15 @@
       z-index: 3;
     }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translate(-50%, 40px);
-      }
-      to {
-        opacity: 1;
-        transform: translate(-50%, 0);
-      }
+    .spotlight {
+      position: fixed;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.01) 80%, rgba(0,0,0,0) 100%);
+      mix-blend-mode: screen;
+      z-index: 10;
     }
   </style>
 </head>
@@ -129,9 +122,9 @@
     <div class="fog"></div>
     <div class="scanlines"></div>
   </div>
-  <div class="title">OBSCURA</div>
-  <div class="subtitle">Something is growing in the shadows...</div>
-  <div class="features">
+  <div class="glow-text title">OBSCURA</div>
+  <div class="glow-text subtitle">Something is growing in the shadows...</div>
+  <div class="glow-text features">
     <p>Based on Nullo Trace Protocol (NTP)</p>
     <ul>
       <li>State-Aware Ratchet: Symmetric + Asymmetric</li>
@@ -145,5 +138,13 @@
     </ul>
   </div>
   <div class="easter-egg">U3NjdXJhIG5vbiBlc3QgcXVvZCBpbiBsdWNlLg==</div>
+  <div class="spotlight" id="spotlight"></div>
+  <script>
+    const spotlight = document.getElementById('spotlight');
+    document.addEventListener('mousemove', e => {
+      spotlight.style.left = `${e.clientX - 100}px`;
+      spotlight.style.top = `${e.clientY - 100}px`;
+    });
+  </script>
 </body>
 </html>
