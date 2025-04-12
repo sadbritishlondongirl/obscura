@@ -14,25 +14,25 @@
     }
 
     body {
-      background: radial-gradient(ellipse at center, #0e0e0e 0%, #050505 100%);
-      color: #dcdcdc;
       font-family: 'JetBrains Mono', monospace;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      color: #dcdcdc;
       height: 100vh;
       overflow: hidden;
+      background: linear-gradient(270deg, #0e0e0e, #050505, #0e0e0e);
+      background-size: 600% 600%;
+      animation: backgroundShift 15s ease infinite;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
     }
 
-    .container {
-      background: rgba(15, 15, 15, 0.9);
-      border: 1px solid #222;
-      padding: 3rem;
-      border-radius: 24px;
-      box-shadow: 0 0 50px rgba(0, 0, 0, 0.85);
-      max-width: 700px;
-      text-align: center;
-      animation: fadeIn 1.5s ease-out;
+    @keyframes backgroundShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     h1 {
@@ -85,16 +85,18 @@
       font-size: 1.1rem;
       line-height: 1.75;
       color: #aaa;
+      max-width: 700px;
       margin-bottom: 2rem;
     }
 
     .features {
       text-align: left;
       margin-top: 1rem;
-      background: #111;
+      background: rgba(17, 17, 17, 0.8);
       padding: 1rem 1.5rem;
       border-radius: 12px;
       border: 1px solid #333;
+      max-width: 700px;
     }
 
     .features li {
@@ -112,36 +114,29 @@
       color: #555;
       margin-top: 2rem;
     }
-
-    @keyframes fadeIn {
-      0% { opacity: 0; transform: scale(0.9); }
-      100% { opacity: 1; transform: scale(1); }
-    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1 class="glitch" data-text="Obscura">Obscura</h1>
-    <p>
-      Из тьмы рождается тишина.<br>
-      Из тишины — послание.<br><br>
-      <strong>Obscura</strong> — мессенджер нового поколения на базе <em>Nullo Trace Protocol (NTP)</em>.<br><br>
-      Приватность. Эфемерность. Forward Secrecy. Метаданные исчезают в темноте.
-    </p>
-    <div class="features">
-      <ul>
-        <li>State-Aware Ratchet — гибридный симметрично-асимметричный механизм</li>
-        <li>Эфемерные сообщения с таймером удаления (TTL)</li>
-        <li>Обмен ключами через QR-коды и nullo://ссылки</li>
-        <li>Групповые чаты с Double Ratchet (MLS-принцип)</li>
-        <li>Paradise Tree Protocol — маршрутизация через сеть прокладок</li>
-        <li>Локальное хранилище ратчетов .nullo/state.db</li>
-        <li>Оффлайн-доставка и восстановление сообщений</li>
-      </ul>
-    </div>
-    <div class="footer">
-      <em>Скоро. Очень скоро.</em>
-    </div>
+  <h1 class="glitch" data-text="Obscura">Obscura</h1>
+  <p>
+    Из тьмы рождается тишина.<br>
+    Из тишины — послание.<br><br>
+    <strong>Obscura</strong> — мессенджер нового поколения на базе <em>Nullo Trace Protocol (NTP)</em>.<br><br>
+    Приватность. Эфемерность. Forward Secrecy. Метаданные исчезают в темноте.
+  </p>
+  <div class="features">
+    <ul>
+      <li>State-Aware Ratchet — гибридный симметрично-асимметричный механизм</li>
+      <li>Эфемерные сообщения с таймером удаления (TTL)</li>
+      <li>Обмен ключами через QR-коды и nullo://ссылки</li>
+      <li>Групповые чаты с Double Ratchet (MLS-принцип)</li>
+      <li>Paradise Tree Protocol — маршрутизация через сеть прокладок</li>
+      <li>Локальное хранилище ратчетов .nullo/state.db</li>
+      <li>Оффлайн-доставка и восстановление сообщений</li>
+    </ul>
+  </div>
+  <div class="footer">
+    <em>Скоро. Очень скоро.</em>
   </div>
 </body>
 </html>
