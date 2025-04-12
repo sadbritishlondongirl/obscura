@@ -57,10 +57,11 @@
 
     .glow-text {
       position: absolute;
-      color: rgba(255, 255, 255, 0);
-      mix-blend-mode: difference;
-      transition: opacity 1s ease;
+      color: #ffffff;
+      opacity: 0;
+      transition: opacity 0.3s ease-out;
       pointer-events: none;
+      filter: blur(2px);
     }
 
     .title {
@@ -107,11 +108,11 @@
 
     .spotlight {
       position: fixed;
-      width: 200px;
-      height: 200px;
+      width: 250px;
+      height: 250px;
       border-radius: 50%;
       pointer-events: none;
-      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.01) 80%, rgba(0,0,0,0) 100%);
+      background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(0,0,0,0.01) 75%, rgba(0,0,0,0) 100%);
       mix-blend-mode: screen;
       z-index: 10;
     }
@@ -122,6 +123,7 @@
     <div class="fog"></div>
     <div class="scanlines"></div>
   </div>
+
   <div class="glow-text title">OBSCURA</div>
   <div class="glow-text subtitle">Something is growing in the shadows...</div>
   <div class="glow-text features">
@@ -137,13 +139,30 @@
       <li>Metadata protection, forward secrecy, and zero-trace architecture</li>
     </ul>
   </div>
+
   <div class="easter-egg">U3NjdXJhIG5vbiBlc3QgcXVvZCBpbiBsdWNlLg==</div>
   <div class="spotlight" id="spotlight"></div>
+
   <script>
     const spotlight = document.getElementById('spotlight');
+    const textElements = document.querySelectorAll('.glow-text');
+
     document.addEventListener('mousemove', e => {
-      spotlight.style.left = `${e.clientX - 100}px`;
-      spotlight.style.top = `${e.clientY - 100}px`;
+      spotlight.style.left = `${e.clientX - spotlight.offsetWidth / 2}px`;
+      spotlight.style.top = `${e.clientY - spotlight.offsetHeight / 2}px`;
+
+      textElements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        const dx = e.clientX - (rect.left + rect.width / 2);
+        const dy = e.clientY - (rect.top + rect.height / 2);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 150) {
+          el.style.opacity = 1;
+        } else {
+          el.style.opacity = 0;
+        }
+      });
     });
   </script>
 </body>
