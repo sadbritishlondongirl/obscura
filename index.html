@@ -5,69 +5,143 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Obscura</title>
   <style>
-    body {
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+    * {
       margin: 0;
       padding: 0;
-      background: linear-gradient(120deg, #0d0d0d, #1a1a1a);
-      color: #e0e0e0;
-      font-family: 'Courier New', Courier, monospace;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(ellipse at center, #0e0e0e 0%, #050505 100%);
+      color: #dcdcdc;
+      font-family: 'JetBrains Mono', monospace;
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
       overflow: hidden;
     }
+
     .container {
+      background: rgba(15, 15, 15, 0.9);
+      border: 1px solid #222;
+      padding: 3rem;
+      border-radius: 24px;
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.85);
+      max-width: 700px;
       text-align: center;
-      max-width: 600px;
-      padding: 2rem;
-      border: 1px solid #333;
-      border-radius: 16px;
-      box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
-      background: rgba(10, 10, 10, 0.7);
+      animation: fadeIn 1.5s ease-out;
     }
+
     h1 {
-      font-size: 2.5rem;
-      letter-spacing: 3px;
-      margin-bottom: 1rem;
-      text-shadow: 0 0 10px #ffffff22;
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      color: #ffffff;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+      letter-spacing: 6px;
     }
-    p {
-      font-size: 1rem;
-      color: #aaa;
-      line-height: 1.6;
-    }
+
     .glitch {
-      color: #fff;
-      font-weight: bold;
-      animation: glitch 2s infinite;
+      position: relative;
+      display: inline-block;
     }
-    @keyframes glitch {
-      0% { text-shadow: 2px 2px #ff00c8, -2px -2px #00ffe1; }
-      20% { text-shadow: -2px 0px #ff00c8, 2px -2px #00ffe1; }
-      40% { text-shadow: 1px -1px #ff00c8, -1px 1px #00ffe1; }
-      60% { text-shadow: -2px 2px #ff00c8, 2px 2px #00ffe1; }
-      80% { text-shadow: 0px 0px #ff00c8, 0px 0px #00ffe1; }
-      100% { text-shadow: 2px 2px #ff00c8, -2px -2px #00ffe1; }
+
+    .glitch::before, .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    .glitch::before {
+      animation: glitchTop 2s infinite;
+      color: #ff00c8;
+      z-index: -1;
+    }
+
+    .glitch::after {
+      animation: glitchBottom 2s infinite;
+      color: #00ffe1;
+      z-index: -2;
+    }
+
+    @keyframes glitchTop {
+      0% { clip-path: inset(0 0 85% 0); transform: translate(2px, -2px); }
+      50% { clip-path: inset(20% 0 65% 0); transform: translate(-2px, 2px); }
+      100% { clip-path: inset(10% 0 75% 0); transform: translate(2px, -1px); }
+    }
+
+    @keyframes glitchBottom {
+      0% { clip-path: inset(90% 0 0 0); transform: translate(-2px, 2px); }
+      50% { clip-path: inset(60% 0 20% 0); transform: translate(1px, -1px); }
+      100% { clip-path: inset(80% 0 10% 0); transform: translate(-1px, 2px); }
+    }
+
+    p {
+      font-size: 1.1rem;
+      line-height: 1.75;
+      color: #aaa;
+      margin-bottom: 2rem;
+    }
+
+    .features {
+      text-align: left;
+      margin-top: 1rem;
+      background: #111;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      border: 1px solid #333;
+    }
+
+    .features li {
+      margin: 0.5rem 0;
+      list-style: square;
+      color: #ccc;
+    }
+
+    .features li::marker {
+      color: #888;
+    }
+
+    .footer {
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 2rem;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1 class="glitch">Obscura</h1>
+    <h1 class="glitch" data-text="Obscura">Obscura</h1>
     <p>
       Из тьмы рождается тишина.<br>
       Из тишины — послание.<br><br>
       <strong>Obscura</strong> — мессенджер нового поколения на базе <em>Nullo Trace Protocol (NTP)</em>.<br><br>
-      Приватность. Эфемерность. Forward Secrecy. Метаданные исчезают в темноте.<br><br>
-      ⚫ State-Aware Ratchet<br>
-      ⚫ Эфемерные сообщения с TTL<br>
-      ⚫ nullo:// QR-ссылки и обмен ключами<br>
-      ⚫ Групповые чаты с double ratchet<br>
-      ⚫ Paradise Tree Protocol: ветвистая сеть доставки в неизвестность
-      <br><br>
-      <em>Открытие близко...</em>
+      Приватность. Эфемерность. Forward Secrecy. Метаданные исчезают в темноте.
     </p>
+    <div class="features">
+      <ul>
+        <li>State-Aware Ratchet — гибридный симметрично-асимметричный механизм</li>
+        <li>Эфемерные сообщения с таймером удаления (TTL)</li>
+        <li>Обмен ключами через QR-коды и nullo://ссылки</li>
+        <li>Групповые чаты с Double Ratchet (MLS-принцип)</li>
+        <li>Paradise Tree Protocol — маршрутизация через сеть прокладок</li>
+        <li>Локальное хранилище ратчетов .nullo/state.db</li>
+        <li>Оффлайн-доставка и восстановление сообщений</li>
+      </ul>
+    </div>
+    <div class="footer">
+      <em>Скоро. Очень скоро.</em>
+    </div>
   </div>
 </body>
 </html>
