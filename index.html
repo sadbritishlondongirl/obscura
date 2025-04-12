@@ -108,15 +108,20 @@
 
     .spotlight {
       position: fixed;
-      width: 160px;
-      height: 160px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       pointer-events: none;
-      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.03) 60%, rgba(0,0,0,0) 100%);
-      box-shadow: 0 0 30px 10px rgba(255,255,255,0.05);
-      filter: blur(1px);
-      mix-blend-mode: screen;
+      background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,200,0.15) 30%, rgba(0,0,0,0) 70%);
+      box-shadow: 0 0 8px 4px rgba(255,255,180,0.2);
+      animation: flicker 1.5s infinite alternate;
       z-index: 10;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.1); }
+      100% { opacity: 0.7; transform: scale(1); }
     }
   </style>
 </head>
