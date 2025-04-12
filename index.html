@@ -24,6 +24,7 @@
       width: 100%;
       background: radial-gradient(circle at center, #0a0a0a, #000);
       overflow: hidden;
+      z-index: 0;
     }
 
     .fog {
@@ -34,6 +35,7 @@
       background-size: cover;
       opacity: 0.04;
       animation: fogMove 120s linear infinite;
+      z-index: 0;
     }
 
     @keyframes fogMove {
@@ -53,15 +55,17 @@
       pointer-events: none;
     }
 
-    .container {
-      position: relative;
-      z-index: 2;
+    .title, .subtitle, .features {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
       text-align: center;
-      top: 50%;
-      transform: translateY(-50%);
+      z-index: 2;
+      animation: fadeInUp 3s ease-out;
     }
 
     .title {
+      top: 15%;
       font-size: 4rem;
       color: #9f9f9f;
       letter-spacing: 5px;
@@ -69,25 +73,24 @@
     }
 
     .subtitle {
+      top: 30%;
       font-size: 1.2rem;
-      margin-top: 10px;
       color: #666;
       text-shadow: 0 0 5px #000;
     }
 
     .features {
-      margin-top: 40px;
+      top: 45%;
       font-size: 0.95rem;
       color: #777;
+      width: 90%;
       max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
       text-align: left;
-      background-color: rgba(10, 10, 10, 0.5);
+      background-color: rgba(10, 10, 10, 0.4);
       padding: 20px;
       border: 1px solid #222;
       border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
     }
 
     .features ul {
@@ -108,6 +111,17 @@
       user-select: none;
       z-index: 3;
     }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translate(-50%, 40px);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+    }
   </style>
 </head>
 <body>
@@ -115,23 +129,20 @@
     <div class="fog"></div>
     <div class="scanlines"></div>
   </div>
-  <div class="container">
-    <div class="title">OBSCURA</div>
-    <div class="subtitle">Something is growing in the shadows...</div>
-
-    <div class="features">
-      <p>Based on Nullo Trace Protocol (NTP)</p>
-      <ul>
-        <li>State-Aware Ratchet: Symmetric + Asymmetric</li>
-        <li>Local secure state recovery</li>
-        <li>Group chats with shared symmetric key + group ratchet (MLS-like)</li>
-        <li>Key exchange via nullo:// links & QR codes</li>
-        <li>Ephemeral messages (TTL / timed deletion)</li>
-        <li>Offline decryption & secure local DB (.nullo/state.db)</li>
-        <li>Obscura Node powered by Paradise Tree Protocol (PTP)</li>
-        <li>Metadata protection, forward secrecy, and zero-trace architecture</li>
-      </ul>
-    </div>
+  <div class="title">OBSCURA</div>
+  <div class="subtitle">Something is growing in the shadows...</div>
+  <div class="features">
+    <p>Based on Nullo Trace Protocol (NTP)</p>
+    <ul>
+      <li>State-Aware Ratchet: Symmetric + Asymmetric</li>
+      <li>Local secure state recovery</li>
+      <li>Group chats with shared symmetric key + group ratchet (MLS-like)</li>
+      <li>Key exchange via nullo:// links & QR codes</li>
+      <li>Ephemeral messages (TTL / timed deletion)</li>
+      <li>Offline decryption & secure local DB (.nullo/state.db)</li>
+      <li>Obscura Node powered by Paradise Tree Protocol (PTP)</li>
+      <li>Metadata protection, forward secrecy, and zero-trace architecture</li>
+    </ul>
   </div>
   <div class="easter-egg">U3NjdXJhIG5vbiBlc3QgcXVvZCBpbiBsdWNlLg==</div>
 </body>
