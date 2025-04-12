@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Obscura</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(120deg, #0d0d0d, #1a1a1a);
+      color: #e0e0e0;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .container {
+      text-align: center;
+      max-width: 600px;
+      padding: 2rem;
+      border: 1px solid #333;
+      border-radius: 16px;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
+      background: rgba(10, 10, 10, 0.7);
+    }
+    h1 {
+      font-size: 2.5rem;
+      letter-spacing: 3px;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px #ffffff22;
+    }
+    p {
+      font-size: 1rem;
+      color: #aaa;
+      line-height: 1.6;
+    }
+    .glitch {
+      color: #fff;
+      font-weight: bold;
+      animation: glitch 2s infinite;
+    }
+    @keyframes glitch {
+      0% { text-shadow: 2px 2px #ff00c8, -2px -2px #00ffe1; }
+      20% { text-shadow: -2px 0px #ff00c8, 2px -2px #00ffe1; }
+      40% { text-shadow: 1px -1px #ff00c8, -1px 1px #00ffe1; }
+      60% { text-shadow: -2px 2px #ff00c8, 2px 2px #00ffe1; }
+      80% { text-shadow: 0px 0px #ff00c8, 0px 0px #00ffe1; }
+      100% { text-shadow: 2px 2px #ff00c8, -2px -2px #00ffe1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="glitch">Obscura</h1>
+    <p>
+      Из тьмы рождается тишина.<br>
+      Из тишины — послание.<br><br>
+      <strong>Obscura</strong> — мессенджер нового поколения на базе <em>Nullo Trace Protocol (NTP)</em>.<br><br>
+      Приватность. Эфемерность. Forward Secrecy. Метаданные исчезают в темноте.<br><br>
+      ⚫ State-Aware Ratchet<br>
+      ⚫ Эфемерные сообщения с TTL<br>
+      ⚫ nullo:// QR-ссылки и обмен ключами<br>
+      ⚫ Групповые чаты с double ratchet<br>
+      ⚫ Paradise Tree Protocol: ветвистая сеть доставки в неизвестность
+      <br><br>
+      <em>Открытие близко...</em>
+    </p>
+  </div>
+</body>
+</html>
