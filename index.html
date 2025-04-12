@@ -3,140 +3,95 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Obscura</title>
+  <title>Obscura — Coming Soon</title>
+  <link href="https://fonts.googleapis.com/css2?family=Unica+One&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
-
-    * {
+    html, body {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'JetBrains Mono', monospace;
-      color: #dcdcdc;
-      height: 100vh;
+      height: 100%;
+      font-family: 'Unica One', sans-serif;
+      color: #d1d1d1;
+      background: radial-gradient(circle at center, #0a0a0a, #000);
       overflow: hidden;
-      background: linear-gradient(270deg, #0e0e0e, #050505, #0e0e0e);
-      background-size: 600% 600%;
-      animation: backgroundShift 15s ease infinite;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 2rem;
     }
 
-    @keyframes backgroundShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 1.5rem;
-      color: #ffffff;
-      text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-      letter-spacing: 6px;
-    }
-
-    .glitch {
-      position: relative;
-      display: inline-block;
-    }
-
-    .glitch::before, .glitch::after {
-      content: attr(data-text);
+    .background {
       position: absolute;
+      top: 0;
       left: 0;
+      height: 100%;
       width: 100%;
-      overflow: hidden;
-      color: #fff;
+      background: repeating-linear-gradient(45deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02) 1px, transparent 1px, transparent 10px);
+      animation: flicker 4s infinite;
     }
 
-    .glitch::before {
-      animation: glitchTop 2s infinite;
-      color: #ff00c8;
-      z-index: -1;
+    @keyframes flicker {
+      0%, 100% { opacity: 0.9; }
+      50% { opacity: 1; }
     }
 
-    .glitch::after {
-      animation: glitchBottom 2s infinite;
-      color: #00ffe1;
-      z-index: -2;
+    .container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
-    @keyframes glitchTop {
-      0% { clip-path: inset(0 0 85% 0); transform: translate(2px, -2px); }
-      50% { clip-path: inset(20% 0 65% 0); transform: translate(-2px, 2px); }
-      100% { clip-path: inset(10% 0 75% 0); transform: translate(2px, -1px); }
+    .title {
+      font-size: 4rem;
+      color: #bbb;
+      letter-spacing: 5px;
+      text-shadow: 0 0 10px #444;
     }
 
-    @keyframes glitchBottom {
-      0% { clip-path: inset(90% 0 0 0); transform: translate(-2px, 2px); }
-      50% { clip-path: inset(60% 0 20% 0); transform: translate(1px, -1px); }
-      100% { clip-path: inset(80% 0 10% 0); transform: translate(-1px, 2px); }
-    }
-
-    p {
-      font-size: 1.1rem;
-      line-height: 1.75;
-      color: #aaa;
-      max-width: 700px;
-      margin-bottom: 2rem;
+    .subtitle {
+      font-size: 1.2rem;
+      margin-top: 10px;
+      color: #666;
     }
 
     .features {
-      text-align: left;
-      margin-top: 1rem;
-      background: rgba(17, 17, 17, 0.8);
-      padding: 1rem 1.5rem;
-      border-radius: 12px;
-      border: 1px solid #333;
-      max-width: 700px;
-    }
-
-    .features li {
-      margin: 0.5rem 0;
-      list-style: square;
-      color: #ccc;
-    }
-
-    .features li::marker {
+      margin-top: 40px;
+      font-size: 0.95rem;
       color: #888;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
     }
 
-    .footer {
-      font-size: 0.9rem;
-      color: #555;
-      margin-top: 2rem;
+    .easter-egg {
+      position: absolute;
+      bottom: 5px;
+      right: 10px;
+      font-size: 0.8rem;
+      color: #222;
+      user-select: none;
     }
   </style>
 </head>
 <body>
-  <h1 class="glitch" data-text="Obscura">Obscura</h1>
-  <p>
-    Из тьмы рождается тишина.<br>
-    Из тишины — послание.<br><br>
-    <strong>Obscura</strong> — мессенджер нового поколения на базе <em>Nullo Trace Protocol (NTP)</em>.<br><br>
-    Приватность. Эфемерность. Forward Secrecy. Метаданные исчезают в темноте.
-  </p>
-  <div class="features">
-    <ul>
-      <li>State-Aware Ratchet — гибридный симметрично-асимметричный механизм</li>
-      <li>Эфемерные сообщения с таймером удаления (TTL)</li>
-      <li>Обмен ключами через QR-коды и nullo://ссылки</li>
-      <li>Групповые чаты с Double Ratchet (MLS-принцип)</li>
-      <li>Paradise Tree Protocol — маршрутизация через сеть прокладок</li>
-      <li>Локальное хранилище ратчетов .nullo/state.db</li>
-      <li>Оффлайн-доставка и восстановление сообщений</li>
-    </ul>
+  <div class="background"></div>
+  <div class="container">
+    <div class="title">OBSCURA</div>
+    <div class="subtitle">Something is growing in the shadows...</div>
+
+    <div class="features">
+      <p>Based on Nullo Trace Protocol (NTP)</p>
+      <ul>
+        <li>State-Aware Ratchet: Symmetric + Asymmetric</li>
+        <li>Local secure state recovery</li>
+        <li>Group chats with shared symmetric key + group ratchet (MLS-like)</li>
+        <li>Key exchange via nullo:// links & QR codes</li>
+        <li>Ephemeral messages (TTL / timed deletion)</li>
+        <li>Offline decryption & secure local DB (.nullo/state.db)</li>
+        <li>Obscura Node powered by Paradise Tree Protocol (PTP)</li>
+        <li>Metadata protection, forward secrecy, and zero-trace architecture</li>
+      </ul>
+    </div>
   </div>
-  <div class="footer">
-    <em>Скоро. Очень скоро.</em>
-  </div>
+  <div class="easter-egg">U3NjdXJhIG5vbiBlc3QgcXVvZCBpbiBsdWNlLg==</div>
 </body>
 </html>
