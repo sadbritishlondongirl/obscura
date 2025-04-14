@@ -124,6 +124,13 @@
       50% { opacity: 0.8; transform: scale(1.2); }
       100% { opacity: 0.5; transform: scale(1); }
     }
+
+    .install-link {
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9rem;
+}
   </style>
 </head>
 <body>
@@ -150,6 +157,8 @@
 
   <div class="easter-egg">U3NjdXJhIG5vbiBlc3QgcXVvZCBpbiBsdWNlLg==</div>
   <div class="spotlight" id="spotlight"></div>
+
+  <div class="glow-text install-link">Wanna more? <a href="https://your-link-to-cli.com" style="color:#fff; text-decoration: underline;">Install Obscura Cli</a></div>
 
   <script>
     const spotlight = document.getElementById('spotlight');
