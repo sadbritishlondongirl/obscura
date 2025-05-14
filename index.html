@@ -1,0 +1,3587 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obscura — защищённый, приватный и умный мессенджер</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2E5BFF;
+            --primary-light: #6E8AFF;
+            --secondary: #C3D0FF;
+            --text: #2D3748;
+            --text-light: #718096;
+            --background: #FFFFFF;
+            --card-bg: #F7FAFC;
+            --border: #E2E8F0;
+            --shadow: rgba(46, 91, 255, 0.1);
+            --success: #38A169;
+            --error: #E53E3E;
+            --transition: all 0.3s ease;
+            
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --radius: 12px;
+        }
+
+        [data-theme="dark"] {
+            --primary: #4C6EFF;
+            --primary-light: #8EA8FF;
+            --secondary: #2A3A5F;
+            --text: #EDF2F7;
+            --text-light: #A0AEC0;
+            --background: #1A202C;
+            --card-bg: #2D3748;
+            --border: #4A5568;
+            --shadow: rgba(26, 32, 44, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent }
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            transition: var(--transition);
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 24px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            transition: var(--transition);
+            background-color: var(--background);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -75%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.3) 100%);
+            transform: skewX(-25deg);
+            animation: shimmer 2s infinite;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            margin-right: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            background-color: var(--background);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            color: var(--text);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        .theme-toggle-sun, .theme-toggle-moon {
+            position: absolute;
+            transition: var(--transition);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle-sun {
+            opacity: 1;
+            transform: translateY(0) rotate(0);
+        }
+
+        .theme-toggle-moon {
+            opacity: 0;
+            transform: translateY(20px) rotate(-45deg);
+        }
+
+        [data-theme="dark"] .theme-toggle-sun {
+            opacity: 0;
+            transform: translateY(-20px) rotate(45deg);
+        }
+
+        [data-theme="dark"] .theme-toggle-moon {
+            opacity: 1;
+            transform: translateY(0) rotate(0);
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 80%;
+            height: 140%;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            opacity: 0.4;
+            z-index: -1;
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 600px;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 16px;
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 32px;
+            max-width: 500px;
+        }
+
+        .hero-image {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 45%;
+            max-width: 600px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero-image-container {
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+
+        .hero-image-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at center, var(--secondary) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(40px);
+            transform: scale(1.2);
+            opacity: 0.3;
+        }
+
+        .hero-image-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-device {
+            width: 100%;
+            height: 100%;
+            background-color: var(--card-bg);
+            border-radius: 30px;
+            box-shadow: 0 30px 60px var(--shadow);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero-device-header {
+            height: 32px;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+        }
+
+        .hero-device-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--background);
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+
+        .ai-typing {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid var(--primary);
+            width: 0;
+            animation: typing 3s steps(40, end) forwards, blink 1s step-end infinite;
+            color: var(--primary);
+        }
+
+        .ai-response {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .ai-response.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            transition: var(--transition);
+            cursor: pointer;
+            text-align: center;
+            border: none;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+            transition: all 1s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 14px rgba(46, 91, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(46, 91, 255, 0.3);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px var(--shadow);
+        }
+
+        section {
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            font-size: 1.1rem;
+        }
+
+        .features {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .features::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -30%;
+            width: 70%;
+            height: 100%;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .feature-ribbon {
+            display: flex;
+            gap: 20px;
+            padding: 20px 0;
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) var(--card-bg);
+            flex-wrap: nowrap;
+            position: relative;
+            animation: scrollFeatures 30s linear infinite;
+            padding-left: 20px;
+            padding-right: 20px;
+            width: calc(200% + 500px);
+        }
+
+        .feature-ribbon:hover {
+            animation-play-state: paused;
+        }
+
+@keyframes scrollFeatures {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-149.998%)); } /* Scroll to middle of duplicated content */
+        }
+
+        /* Remove scrollbar but keep functionality */
+        .feature-ribbon::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .feature-ribbon {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        .feature-card {
+            min-width: 300px;
+            flex: 0 0 auto;
+            height: 220px;
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: 0 10px 30px var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: var(--transition);
+            margin: 10px;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px var(--shadow);
+            border-color: var(--primary-light);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-icon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: skewX(-20deg);
+            left: -150%;
+            animation: shimmer 3s infinite;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .feature-text {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .security {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .security::after {
+            content: '';
+            position: absolute;
+            top: 10%;
+            right: -20%;
+            width: 60%;
+            height: 80%;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .security-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: 0 10px 30px var(--shadow);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .security-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px var(--shadow);
+            border-color: var(--primary-light);
+        }
+
+        .security-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 0;
+            background-color: var(--primary);
+            transition: height 0.5s ease;
+        }
+
+        .security-card:hover::before {
+            height: 100%;
+        }
+
+        .security-icon {
+            width: 60px;
+            height: 60px;
+            background-color: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-size: 1.8rem;
+            position: relative;
+        }
+
+        .security-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            top: 0;
+            left: 0;
+            opacity: 0.5;
+            animation: pulse 2s infinite;
+        }
+
+        .security-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .security-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .security-list li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            position: relative;
+            padding-left: 26px;
+        }
+
+        .security-list li::before {
+            content: '✓';
+            color: var(--primary);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .parallax-section {
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            background-image: linear-gradient(45deg, var(--primary-light), var(--primary));
+        }
+
+        .parallax-content {
+            text-align: center;
+            color: white;
+            z-index: 10;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+
+        .parallax-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .parallax-text {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .waitlist {
+            position: relative;
+        }
+
+        .waitlist::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            background: linear-gradient(to top, var(--secondary) 0%, transparent 100%);
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .waitlist-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: 0 15px 50px var(--shadow);
+            border: 1px solid var(--border);
+            margin-top: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .waitlist-form::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: -100px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .waitlist-form::after {
+            content: '';
+            position: absolute;
+            bottom: -100px;
+            right: -100px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            background-color: var(--background);
+            color: var(--text);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46, 91, 255, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-light);
+            opacity: 0.7;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+        }
+
+        .developers {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .developers::before {
+            content: '';
+            position: absolute;
+            top: 30%;
+            right: -10%;
+            width: 40%;
+            height: 60%;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            opacity: 0.2;
+            z-index: -1;
+        }
+
+        .developers-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .developers-image {
+            position: relative;
+        }
+
+        .developers-image img {
+            width: 100%;
+            border-radius: var(--radius);
+            box-shadow: 0 20px 40px var(--shadow);
+            transition: var(--transition);
+        }
+
+        .developers-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .developers-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .developers-text {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .dev-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: 0 10px 30px var(--shadow);
+            border: 1px solid var(--border);
+            margin-top: 10px;
+            transition: var(--transition);
+        }
+
+        .dev-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px var(--shadow);
+            border-color: var(--primary-light);
+        }
+
+        .dev-card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .dev-form {
+            margin-top: 30px;
+        }
+
+        footer {
+            background-color: var(--card-bg);
+            padding: 60px 0 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--primary-light), var(--secondary), var(--primary-light), var(--primary));
+            animation: shimmer 8s linear infinite;
+            background-size: 200% 100%;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-text {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--background);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.2rem;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+            text-decoration: none;
+        }
+
+        .social-icon:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .footer-links h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+
+        .footer-newsletter h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .newsletter-form {
+            display: flex;
+            margin-top: 15px;
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: var(--radius) 0 0 var(--radius);
+            border: 1px solid var(--border);
+            background-color: var(--background);
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .newsletter-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .newsletter-btn {
+            padding: 0 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .newsletter-btn:hover {
+            background-color: var(--primary-light);
+        }
+
+        .footer-bottom {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: var(--background);
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: var(--radius);
+            box-shadow: 0 5px 15px var(--shadow);
+            font-size: 0.85rem;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+            max-width: 200px;
+            text-align: center;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--card-bg);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 15px 20px;
+            box-shadow: 0 8px 16px var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            max-width: 350px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(46, 91, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: var(--text);
+        }
+
+        .notification-text {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 5px;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            margin-left: 5px;
+        }
+
+        .notification-close:hover {
+            color: var(--error);
+        }
+
+        /* Features tabs and interactive elements */
+        .features-tabs {
+            margin-bottom: 60px;
+        }
+        
+        .tab-controls {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+        }
+        
+        .tab-indicator {
+            position: absolute;
+            bottom: -2px;
+            height: 3px;
+            background-color: var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .tab-content-container {
+            position: relative;
+            min-height: 450px;
+        }
+        
+        .tab-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .tab-content.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            position: relative;
+        }
+        
+        .tab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        
+        .tab-feature {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: 0 10px 30px var(--shadow);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab-feature:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px var(--shadow);
+            border-color: var(--primary-light);
+        }
+        
+        .feature-icon-wrapper {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        /* CSS-based icons instead of emojis */
+        /* Security lock icon */
+        .feature-icon-security {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        
+        .lock-body {
+            position: absolute;
+            width: 30px;
+            height: 20px;
+            background-color: var(--primary);
+            border-radius: 5px;
+            bottom: 10px;
+            left: 15px;
+        }
+        
+        .lock-shackle {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border: 5px solid var(--primary);
+            border-bottom: transparent;
+            border-radius: 24px 24px 0 0;
+            top: 15px;
+            left: 18px;
+            animation: lock-shackle 3s infinite;
+        }
+        
+        @keyframes lock-shackle {
+            0% { transform: translateY(0); }
+            20% { transform: translateY(-5px); }
+            30% { transform: translateY(0); }
+            100% { transform: translateY(0); }
+        }
+        
+        /* Signature icon */
+        .feature-icon-signature {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        
+        .pen {
+            position: absolute;
+            width: 6px;
+            height: 30px;
+            background: linear-gradient(to bottom, var(--primary), var(--primary-light));
+            transform: rotate(-45deg);
+            top: 15px;
+            left: 25px;
+        }
+        
+        .pen::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 3px solid transparent;
+            border-right: 3px solid transparent;
+            border-bottom: 8px solid var(--primary);
+            bottom: 100%;
+            left: 0;
+        }
+        
+        .signature-line {
+            position: absolute;
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), transparent);
+            bottom: 15px;
+            right: 10px;
+            animation: signature 3s infinite;
+        }
+        
+        @keyframes signature {
+            0% { width: 0; opacity: 0; }
+            20% { width: 40px; opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        /* Metadata shield icon */
+        .feature-icon-metadata {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        
+        .shield-outer {
+            position: absolute;
+            width: 36px;
+            height: 44px;
+            background-color: var(--primary-light);
+            border-radius: 18px 18px 3px 3px;
+            top: 10px;
+            left: 12px;
+        }
+        
+        .shield-inner {
+            position: absolute;
+            width: 24px;
+            height: 30px;
+            background-color: var(--card-bg);
+            border-radius: 12px 12px 2px 2px;
+            top: 16px;
+            left: 18px;
+        }
+        
+        .shield-lines {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            top: 24px;
+            left: 23px;
+            overflow: hidden;
+            animation: shield-pulse 2s infinite;
+        }
+        
+        @keyframes shield-pulse {
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.7; }
+        }
+        
+        /* Storage icon */
+        .feature-icon-storage {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        
+        .database {
+            position: absolute;
+            width: 36px;
+            height: 14px;
+            background-color: var(--primary);
+            border-radius: 4px 4px 18px 18px;
+            bottom: 15px;
+            left: 12px;
+        }
+        
+        .database::before {
+            content: '';
+            position: absolute;
+            width: 36px;
+            height: 14px;
+            background-color: var(--primary);
+            border-radius: 18px 18px 4px 4px;
+            bottom: 100%;
+            left: 0;
+            opacity: 0.7;
+        }
+        
+        .database::after {
+            content: '';
+            position: absolute;
+            width: 36px;
+            height: 14px;
+            background-color: var(--primary);
+            border-radius: 18px 18px 18px 18px;
+            bottom: 200%;
+            left: 0;
+            opacity: 0.4;
+        }
+        
+        .lock {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            top: 15px;
+            right: 12px;
+        }
+        
+        .lock::before {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            top: 5px;
+            left: 5px;
+            animation: lock-glow 2s infinite;
+        }
+        
+        @keyframes lock-glow {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.6; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* AI assistant icon */
+        .feature-icon-assistant {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        
+        .assistant-head {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(to bottom right, var(--primary), var(--primary-light));
+            border-radius: 50%;
+            top: 10px;
+            left: 15px;
+        }
+        
+        .assistant-wave {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 3px solid transparent;
+            border-right: 3px solid var(--primary-light);
+            border-radius: 50%;
+            top: 5px;
+            left: 10px;
+            animation: wave-rotate 3s infinite linear;
+        }
+        
+        .assistant-wave::before {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border: 3px solid transparent;
+            border-right: 3px solid var(--primary-light);
+            border-radius: 50%;
+            top: -8px;
+            left: -8px;
+            opacity: 0.7;
+            animation: wave-rotate 4s infinite linear;
+        }
+        
+        @keyframes wave-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Voice activation icon */
+        .feature-icon-voice {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        
+        .voice-mic {
+            position: absolute;
+            width: 14px;
+            height: 28px;
+            background-color: var(--primary);
+            border-radius: 7px;
+            top: 16px;
+            left: 23px;
+        }
+        
+        .voice-wave {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 3px solid transparent;
+            border-radius: 50%;
+            top: 10px;
+            left: 10px;
+            overflow: hidden;
+        }
+        
+        .voice-wave::before,
+        .voice-wave::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, transparent 50%, var(--primary-light) 50%);
+            border-radius: 50%;
+            top: -10px;
+            left: -10px;
+            opacity: 0;
+            animation: voice-wave 3s infinite;
+        }
+        
+        .voice-wave::after {
+            animation-delay: 1s;
+        }
+        
+        @keyframes voice-wave {
+            0% { transform: scale(0); opacity: 0.3; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+        
+        /* Plugin icon */
+        .feature-icon-plugin {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        
+        .plugin-base {
+            position: absolute;
+            width: 34px;
+            height: 24px;
+            background-color: var(--primary);
+            border-radius: 4px;
+            bottom: 15px;
+            left: 13px;
+        }
+        
+        .plugin-connector {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            background-color: var(--primary-light);
+            top: 15px;
+            left: 25px;
+        }
+        
+        .plugin-connector::before,
+        .plugin-connector::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 8px;
+            background-color: var(--primary-light);
+            top: 0;
+        }
+        
+        .plugin-connector::before {
+            left: -16px;
+            border-radius: 4px 0 0 4px;
+        }
+        
+        .plugin-connector::after {
+            left: 10px;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        /* Privacy icon */
+        .feature-icon-privacy {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        
+        .eye {
+            position: absolute;
+            width: 30px;
+            height: 16px;
+            border: 3px solid var(--primary);
+            border-radius: 30px;
+            top: 22px;
+            left: 15px;
+        }
+        
+        .eye::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            top: 3px;
+            left: 10px;
+        }
+        
+        .slash {
+            position: absolute;
+            width: 4px;
+            height: 40px;
+            background-color: var(--error);
+            transform: rotate(45deg);
+            top: 10px;
+            left: 28px;
+            animation: slash-appear 3s infinite;
+        }
+        
+        @keyframes slash-appear {
+            0% { opacity: 0; transform: rotate(45deg) scale(0); }
+            20% { opacity: 1; transform: rotate(45deg) scale(1); }
+            80% { opacity: 1; transform: rotate(45deg) scale(1); }
+            100% { opacity: 0; transform: rotate(45deg) scale(0); }
+        }
+        
+        /* Platform icons */
+        .feature-icon-platforms {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        
+        .platform-win,
+        .platform-mac,
+        .platform-linux {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background-color: var(--primary);
+            opacity: 0.8;
+            transition: var(--transition);
+        }
+        
+        .platform-win {
+            border-radius: 2px;
+            top: 15px;
+            left: 22px;
+            transform: rotate(0deg);
+        }
+        
+        .platform-mac {
+            border-radius: 50%;
+            top: 30px;
+            left: 12px;
+            transform: rotate(0deg);
+        }
+        
+        .platform-linux {
+            border-radius: 0 0 8px 8px;
+            top: 30px;
+            right: 12px;
+            transform: rotate(0deg);
+        }
+        
+        /* Plugins and OneID icons */
+        .feature-icon-plugins {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        
+        .puzzle-piece-1, 
+        .puzzle-piece-2 {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+        
+        .puzzle-piece-1 {
+            border-radius: 50% 0 50% 50%;
+            top: 15px;
+            left: 15px;
+            animation: puzzle-float 3s infinite;
+        }
+        
+        .puzzle-piece-2 {
+            border-radius: 0 50% 50% 50%;
+            bottom: 15px;
+            right: 15px;
+            animation: puzzle-float 3s infinite;
+            animation-delay: 1.5s;
+        }
+        
+        @keyframes puzzle-float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(10deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        
+        .feature-icon-oneid {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        
+        .id-card {
+            position: absolute;
+            width: 40px;
+            height: 28px;
+            background-color: var(--primary-light);
+            border-radius: 4px;
+            top: 16px;
+            left: 10px;
+        }
+        
+        .id-card::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--card-bg);
+            border-radius: 50%;
+            top: 5px;
+            left: 5px;
+        }
+        
+        .id-card::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 3px;
+            background-color: var(--card-bg);
+            border-radius: 2px;
+            top: 18px;
+            left: 5px;
+        }
+        
+        .check-mark {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--success);
+            bottom: 8px;
+            right: 8px;
+            opacity: 0;
+            animation: check-appear 3s infinite;
+        }
+        
+        .check-mark::before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 3px;
+            background-color: white;
+            transform: rotate(45deg);
+            top: 8px;
+            left: 2px;
+        }
+        
+        .check-mark::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 8px;
+            background-color: white;
+            transform: rotate(45deg);
+            top: 4px;
+            right: 5px;
+        }
+        
+        @keyframes check-appear {
+            0% { opacity: 0; transform: scale(0); }
+            20% { opacity: 1; transform: scale(1); }
+            80% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0); }
+        }
+        
+        /* Open source icon */
+        .feature-icon-opensource {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        
+        .code-brackets {
+            position: absolute;
+            width: 40px;
+            height: 30px;
+            border: 3px solid var(--primary);
+            border-top: transparent;
+            border-bottom: transparent;
+            top: 15px;
+            left: 10px;
+        }
+        
+        .code-brackets::before,
+        .code-brackets::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 3px;
+            background-color: var(--primary);
+        }
+        
+        .code-brackets::before {
+            top: -3px;
+            left: 0;
+        }
+        
+        .code-brackets::after {
+            bottom: -3px;
+            right: 0;
+        }
+        
+        .code-line-1,
+        .code-line-2 {
+            position: absolute;
+            height: 3px;
+            background-color: var(--primary-light);
+            left: 15px;
+        }
+        
+        .code-line-1 {
+            width: 30px;
+            top: 24px;
+            animation: code-line 3s infinite;
+        }
+        
+        .code-line-2 {
+            width: 20px;
+            top: 34px;
+            animation: code-line 3s infinite;
+            animation-delay: 1.5s;
+        }
+        
+        @keyframes code-line {
+            0% { transform: translateX(0); opacity: 0.5; }
+            50% { transform: translateX(5px); opacity: 1; }
+            100% { transform: translateX(0); opacity: 0.5; }
+        }
+        
+        .feature-details {
+            margin-top: 15px;
+            height: 0;
+            overflow: hidden;
+            transition: height 0.3s ease;
+        }
+        
+        .tab-feature:hover .feature-details {
+            height: auto;
+            max-height: 150px;
+        }
+        
+        /* Comparison section */
+        .comparison {
+            position: relative;
+            background-color: var(--background);
+            overflow: hidden;
+        }
+        
+        .comparison::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -30%;
+            width: 70%;
+            height: 100%;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        .comparison-container {
+            margin-top: 50px;
+        }
+        
+        .comparison-controls {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .comparison-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .comparison-btn.active {
+            color: var(--primary);
+        }
+        
+        .comparison-indicator {
+            position: absolute;
+            bottom: -2px;
+            height: 3px;
+            background-color: var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .comparison-wheel-container {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .comparison-wheel {
+            width: 300px;
+            height: 300px;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .wheel-center {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: var(--card-bg);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px var(--shadow);
+            border: 2px solid var(--primary);
+        }
+        
+        .wheel-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .wheel-logo .logo-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 0;
+            margin-bottom: 5px;
+        }
+        
+        .wheel-segments {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transform: rotate(0deg);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .wheel-segment {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 50%);
+            transform-origin: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .wheel-segment:nth-child(1) {
+            transform: rotate(0deg);
+            background: radial-gradient(circle at 30% 30%, var(--primary-light) 0%, var(--primary) 70%);
+        }
+        
+        .wheel-segment:nth-child(2) {
+            transform: rotate(60deg);
+            background: radial-gradient(circle at 30% 30%, var(--primary-light) 0%, var(--primary) 70%);
+        }
+        
+        .wheel-segment:nth-child(3) {
+            transform: rotate(120deg);
+            background: radial-gradient(circle at 30% 30%, var(--primary-light) 0%, var(--primary) 70%);
+        }
+        
+        .wheel-segment:nth-child(4) {
+            transform: rotate(180deg);
+            background: radial-gradient(circle at 30% 30%, var(--primary-light) 0%, var(--primary) 70%);
+        }
+        
+        .wheel-segment:nth-child(5) {
+            transform: rotate(240deg);
+            background: radial-gradient(circle at 30% 30%, var(--primary-light) 0%, var(--primary) 70%);
+        }
+        
+        .wheel-segment:nth-child(6) {
+            transform: rotate(300deg);
+            background: radial-gradient(circle at 30% 30%, var(--primary-light) 0%, var(--primary) 70%);
+        }
+        
+        .wheel-segment.active {
+            filter: brightness(1.2);
+        }
+        
+        .segment-content {
+            position: absolute;
+            top: 25%;
+            left: 75%;
+            transform: translate(-50%, -50%) rotate(30deg);
+            color: white;
+            text-align: center;
+            width: 90px;
+        }
+        
+        .wheel-segment:nth-child(1) .segment-content {
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+        
+        .wheel-segment:nth-child(2) .segment-content {
+            transform: translate(-50%, -50%) rotate(-60deg);
+        }
+        
+        .wheel-segment:nth-child(3) .segment-content {
+            transform: translate(-50%, -50%) rotate(-120deg);
+        }
+        
+        .wheel-segment:nth-child(4) .segment-content {
+            transform: translate(-50%, -50%) rotate(-180deg);
+        }
+        
+        .wheel-segment:nth-child(5) .segment-content {
+            transform: translate(-50%, -50%) rotate(-240deg);
+        }
+        
+        .wheel-segment:nth-child(6) .segment-content {
+            transform: translate(-50%, -50%) rotate(-300deg);
+        }
+        
+        .segment-content h4 {
+            font-size: 0.85rem;
+            margin: 0;
+            font-weight: 600;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .comparison-details {
+            flex: 1;
+            margin-left: 30px;
+            max-width: 600px;
+        }
+        
+        .competitor-details {
+            display: none;
+        }
+        
+        .competitor-details.active {
+            display: block;
+        }
+        
+        .comparison-detail-item {
+            display: none;
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: 0 10px 30px var(--shadow);
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .comparison-detail-item.active {
+            display: block;
+        }
+        
+        .comparison-detail-item h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .comparison-bars {
+            margin-bottom: 20px;
+        }
+        
+        .bar-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .bar-label {
+            width: 100px;
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .bar-container {
+            flex: 1;
+            height: 10px;
+            background-color: var(--border);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 0 15px;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+            border-radius: 5px;
+            transition: width 1s ease;
+        }
+        
+        .bar-value {
+            width: 120px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        
+        .comparison-text {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 992px) {
+            .hero-image {
+                display: none;
+            }
+            
+            .hero-content {
+                max-width: 100%;
+            }
+            
+            .wheel-container {
+                height: auto;
+                display: block;
+            }
+            
+            .feature-wheel {
+                transform: none !important;
+                animation: none;
+                width: 100%;
+                height: auto;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 20px;
+            }
+            
+            .feature-card {
+                position: relative;
+                width: 100%;
+                height: auto;
+                transform: none !important;
+            }
+            
+            .developers-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .developers-image {
+                order: 2;
+            }
+            
+            .developers-content {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .parallax-title {
+                font-size: 2.2rem;
+            }
+            
+            .cta-group {
+                flex-direction: column;
+            }
+            
+            .security-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .waitlist-form {
+                padding: 25px;
+            }
+            
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .section-title {
+                font-size: 1.7rem;
+            }
+            
+            .parallax-title {
+                font-size: 1.8rem;
+            }
+            
+            .notification {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <div class="logo-icon"></div>
+                Obscura
+            </a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему">
+                <div class="theme-toggle-sun">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </div>
+                <div class="theme-toggle-moon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </div>
+            </button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Obscura — защищённый, приватный и умный мессенджер</h1>
+                <p class="hero-subtitle">Новый стандарт общения, объединяющий современные криптографические стандарты, искусственный интеллект и абсолютную приватность.</p>
+                <div class="cta-group">
+                    <button class="btn btn-primary" id="waitlistBtn">Присоединиться к Wait List</button>
+                    <button class="btn btn-outline" id="learnMoreBtn">Узнать больше</button>
+                </div>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="hero-image-container">
+                <div class="hero-image-bg"></div>
+                <div class="hero-image-content">
+                    <div class="hero-device">
+                        <div class="hero-device-header">
+                            <div class="hero-device-dot"></div>
+                            <div class="hero-device-dot"></div>
+                            <div class="hero-device-dot"></div>
+                        </div>
+                        <div style="padding: 20px;">
+                            <div style="display: flex; margin-bottom: 20px;">
+                                <div style="background-color: var(--primary-light); color: white; padding: 12px; border-radius: 12px 12px 1px 12px; margin-right: 50px; font-size: 0.9rem;">
+                                    Привет, Алия! Можешь помочь мне с составлением отчета?
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <div style="width: 30px; height: 30px; background-color: var(--primary); border-radius: 50%; margin-right: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">A</div>
+                                <div class="ai-typing">Конечно! Какой отчет вам нужно составить?</div>
+                            </div>
+                            <div class="ai-response" id="aiResponse" style="background-color: var(--secondary); color: var(--text); padding: 12px; border-radius: 12px 12px 12px 1px; margin-left: 40px; max-width: 80%; font-size: 0.9rem;">
+                                Я могу помочь вам с составлением любого отчета. Расскажите, какая тема, какие данные нужно включить, и я подготовлю структуру и помогу с формулировками.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Возможности Obscura</h2>
+            <p class="section-subtitle">Мессенджер нового поколения, который сочетает в себе безопасность, приватность и интеллект</p>
+            
+            <div class="features-tabs">
+                <div class="tab-controls">
+                    <button class="tab-btn active" data-tab="security">Безопасность</button>
+                    <button class="tab-btn" data-tab="ai">Искусственный интеллект</button>
+                    <button class="tab-btn" data-tab="ecosystem">Экосистема</button>
+                    <div class="tab-indicator"></div>
+                </div>
+                
+                <div class="tab-content-container">
+                    <div class="tab-content active" data-tab="security">
+                        <div class="tab-grid">
+                            <div class="tab-feature">
+                                <div class="feature-icon-wrapper">
+                                    <div class="feature-icon-security">
+                                        <div class="lock-body"></div>
+                                        <div class="lock-shackle"></div>
+                                    </div>
+                                </div>
+                                <h3>Многоуровневое E2E шифрование</h3>
+                                <p>Triple-Layer Encryption: шифрование на транспортном, сессионном и контентном уровнях с использованием современных алгоритмов Curve25519, XSalsa20 и Poly1305.</p>
+                                <div class="feature-details">
+                                    <ul>
+                                        <li>Perfect Forward Secrecy защищает старые сообщения даже при компрометации ключей</li>
+                                        <li>Blake2b + Argon2: быстрый хеширование и защита от брутфорса</li>
+                                        <li>Готовность к пост-квантовой эре</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-feature">
+                                <div class="feature-icon-wrapper">
+                                    <div class="feature-icon-signature">
+                                        <div class="pen"></div>
+                                        <div class="signature-line"></div>
+                                    </div>
+                                </div>
+                                <h3>Цифровые подписи</h3>
+                                <p>Все сообщения подписываются с использованием Ed25519, обеспечивая гарантию подлинности и целостности данных без централизованного хранилища ключей.</p>
+                                <div class="feature-details">
+                                    <ul>
+                                        <li>Многофакторная верификация собеседников</li>
+                                        <li>Защита от подмены сообщений и MITM-атак</li>
+                                        <li>Распределенная система доверия</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-feature">
+                                <div class="feature-icon-wrapper">
+                                    <div class="feature-icon-metadata">
+                                        <div class="shield-outer"></div>
+                                        <div class="shield-inner"></div>
+                                        <div class="shield-lines"></div>
+                                    </div>
+                                </div>
+                                <h3>Защита метаданных</h3>
+                                <p>Paradise Tree Protocol обеспечивает распределённую маршрутизацию сообщений через доверенные узлы с использованием принципов луковой маршрутизации.</p>
+                                <div class="feature-details">
+                                    <ul>
+                                        <li>Рандомизация размеров пакетов и задержек</li>
+                                        <li>Защита от анализа трафика и профилирования</li>
+                                        <li>Шифрование не только содержимого, но и маршрута</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-feature">
+                                <div class="feature-icon-wrapper">
+                                    <div class="feature-icon-storage">
+                                        <div class="database"></div>
+                                        <div class="lock"></div>
+                                    </div>
+                                </div>
+                                <h3>Zero-Knowledge Storage</h3>
+                                <p>Сервер ничего не знает о вашем содержимом благодаря Zero-Knowledge архитектуре и локальному шифрованию данных.</p>
+                                <div class="feature-details">
+                                    <ul>
+                                        <li>Самоуничтожающиеся сообщения с настраиваемыми таймерами</li>
+                                        <li>Безопасное удаление с физическим перезаписыванием</li>
+                                        <li>Максимальная локализация данных без облака</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" data-tab="ai">
+                        <div class="tab-grid">
+                            <div class="tab-feature">
+                                <div class="feature-icon-wrapper">
+                                    <div class="feature-icon-assistant">
+                                        <div class="assistant-head"></div>
+                                        <div class="assistant-wave"></div>
+                                    </div>
+                                </div>
+                                <h3>Алия - ваш персональный помощник</h3>
+                                <p>Встроенный голосовой и текстовый ассистент на базе новейших моделей ИИ, всегда готовый помочь с любыми задачами.</p>
+                                <div class="feature-details">
+                                    <ul>
+                                        <li>Отвечает на вопросы и ищет информацию</li>
+                                        <li>Составляет письма и помогает с документами</li>
+                                        <li>Резюмирует встречи и разговоры</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-feature">
+                                <div class="feature-icon-wrapper">
+                                    <div class="feature-icon-voice">
+                                        <div class="voice-wave"></div>
+                                        <div class="voice-mic"></div>
+                                    </div>
+                                </div>
+                                <h3>Голосовая активация</h3>
+                                <p>Алия всегда слушает и готова помочь вам. Просто скажите "Алия", и она тут же активируется для выполнения ваших задач.</p>
+                                <div class="feature-details">
+                                    <ul>
+                                        <li>Фоновая работа с минимальным потреблением ресурсов</li>
+                                        <li>Локальное распознавание ключевого слова</li>
+                                        <li>Персонализированное обучение голосовой модели</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-feature">
+                                <div class="feature-icon-wrapper">
+                                    <div class="feature-icon-plugin">
+                                        <div class="plugin-base"></div>
+                                        <div class="plugin-connector"></div>
+                                    </div>
+                                </div>
+                                <h3>Расширяемый AI</h3>
+                                <p>Создавайте собственные AI-плагины, расширяющие возможности Алии, и делитесь ими через встроенный маркет с сообществом.</p>
+                                <div class="feature-details">
+                                    <ul>
+                                        <li>Стандартизированный API для разработчиков</li>
+                                        <li>Безопасный sandbox для AI-плагинов</li>
+                                        <li>Локальное выполнение без облачной обработки</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-feature">
+                                <div class="feature-icon-wrapper">
+                                    <div class="feature-icon-privacy">
+                                        <div class="eye"></div>
+                                        <div class="slash"></div>
+                                    </div>
+                                </div>
+                                <h3>Приватность AI</h3>
+                                <p>В отличие от других мессенджеров, AI-ассистент Obscura работает с полным сохранением приватности и шифрованием всех данных.</p>
+                                <div class="feature-details">
+                                    <ul>
+                                        <li>Приоритет локальной обработки данных</li>
+                                        <li>Шифрование запросов к внешним моделям</li>
+                                        <li>Контроль над данными, используемыми для обучения</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" data-tab="ecosystem">
+                        <div class="tab-grid">
+                            <div class="tab-feature">
+                                <div class="feature-icon-wrapper">
+                                    <div class="feature-icon-platforms">
+                                        <div class="platform-win"></div>
+                                        <div class="platform-mac"></div>
+                                        <div class="platform-linux"></div>
+                                    </div>
+                                </div>
+                                <h3>Кроссплатформенность</h3>
+                                <p>Obscura работает на всех основных платформах: Windows, macOS и Linux, обеспечивая полную синхронизацию и согласованный опыт.</p>
+                                <div class="feature-details">
+                                    <ul>
+                                        <li>Нативная производительность на всех ОС</li>
+                                        <li>Оптимизированный пользовательский интерфейс</li>
+                                        <li>Полная согласованность данных между устройствами</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-feature">
+                                <div class="feature-icon-wrapper">
+                                    <div class="feature-icon-plugins">
+                                        <div class="puzzle-piece-1"></div>
+                                        <div class="puzzle-piece-2"></div>
+                                    </div>
+                                </div>
+                                <h3>Плагины и расширения</h3>
+                                <p>Стандартизированный API и SDK для создания плагинов с обязательной верификацией и промежуточной проверкой всего кода.</p>
+                                <div class="feature-details">
+                                    <ul>
+                                        <li>Plugin Verification для проверки целостности</li>
+                                        <li>Цифровая подпись всех плагинов</li>
+                                        <li>Принцип минимальных привилегий</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-feature">
+                                <div class="feature-icon-wrapper">
+                                    <div class="feature-icon-oneid">
+                                        <div class="id-card"></div>
+                                        <div class="check-mark"></div>
+                                    </div>
+                                </div>
+                                <h3>OneID - умная аутентификация</h3>
+                                <p>OneID - инновационная система аутентификации, заменяющая пароли безопасными, гибкими и приватными способами входа.</p>
+                                <div class="feature-details">
+                                    <ul>
+                                        <li>Поддержка FIDO2/Passkey (Face ID, Touch ID)</li>
+                                        <li>Безопасное восстановление через доверенные контакты</li>
+                                        <li>Интеллектуальный анализ рисков и защита от фишинга</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-feature">
+                                <div class="feature-icon-wrapper">
+                                    <div class="feature-icon-opensource">
+                                        <div class="code-brackets"></div>
+                                        <div class="code-line-1"></div>
+                                        <div class="code-line-2"></div>
+                                    </div>
+                                </div>
+                                <h3>Открытый исходный код</h3>
+                                <p>Полная прозрачность кода с возможностью аудита, reproducible builds и поддержкой со стороны сообщества разработчиков.</p>
+                                <div class="feature-details">
+                                    <ul>
+                                        <li>Формальная верификация криптографии</li>
+                                        <li>Bug bounty программа и независимые аудиты</li>
+                                        <li>Публикация всех отчетов и истории изменений</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="wheel-container">
+                <div class="feature-ribbon" id="featureRibbon">
+                    <!-- Feature cards will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="comparison" id="comparison">
+        <div class="container">
+            <h2 class="section-title">Сравнение с другими мессенджерами</h2>
+            <p class="section-subtitle">Почему Obscura представляет новый стандарт защищенной коммуникации</p>
+            
+            <div class="comparison-container">
+                <div class="comparison-controls">
+                    <button class="comparison-btn active" data-compare="signal">Signal</button>
+                    <button class="comparison-btn" data-compare="telegram">Telegram</button>
+                    <button class="comparison-btn" data-compare="proton">ProtonMail</button>
+                    <div class="comparison-indicator"></div>
+                </div>
+                
+                <div class="comparison-wheel-container">
+                    <div class="comparison-wheel" id="comparisonWheel">
+                        <div class="wheel-center">
+                            <div class="wheel-logo">
+                                <div class="logo-icon"></div>
+                                <span>Obscura</span>
+                            </div>
+                        </div>
+                        
+                        <div class="wheel-segments">
+                            <div class="wheel-segment active" data-category="e2e">
+                                <div class="segment-content">
+                                    <h4>E2E Шифрование</h4>
+                                </div>
+                            </div>
+                            <div class="wheel-segment" data-category="metadata">
+                                <div class="segment-content">
+                                    <h4>Защита метаданных</h4>
+                                </div>
+                            </div>
+                            <div class="wheel-segment" data-category="groups">
+                                <div class="segment-content">
+                                    <h4>Защита групповых чатов</h4>
+                                </div>
+                            </div>
+                            <div class="wheel-segment" data-category="transparency">
+                                <div class="segment-content">
+                                    <h4>Прозрачность кода</h4>
+                                </div>
+                            </div>
+                            <div class="wheel-segment" data-category="infrastructure">
+                                <div class="segment-content">
+                                    <h4>Децентрализация</h4>
+                                </div>
+                            </div>
+                            <div class="wheel-segment" data-category="ai">
+                                <div class="segment-content">
+                                    <h4>Приватный AI</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-details">
+                        <div class="competitor-details active" data-compare="signal">
+                            <div class="comparison-detail-item active" data-category="e2e">
+                                <h3>E2E Шифрование</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Triple-Layer E2E</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">Signal</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 95%"></div>
+                                        </div>
+                                        <span class="bar-value">Надежное E2E</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">Signal предлагает высококачественное E2E шифрование, сопоставимое с Obscura. Оба мессенджера используют современные криптографические алгоритмы, но Obscura дополнительно предлагает Triple-Layer Encryption на всех уровнях коммуникации.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="metadata">
+                                <h3>Защита метаданных</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Paradise Tree Protocol</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">Signal</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 70%"></div>
+                                        </div>
+                                        <span class="bar-value">Sealed Sender</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">Хотя Signal использует технологию Sealed Sender для минимизации метаданных, он все еще полагается на центральные серверы. Obscura применяет Paradise Tree Protocol и луковую маршрутизацию для полной анонимизации метаданных.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="groups">
+                                <h3>Защита групповых чатов</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Полное E2E</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">Signal</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 90%"></div>
+                                        </div>
+                                        <span class="bar-value">Secure Group</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">Signal предлагает шифрование групповых чатов, однако Obscura использует передовой протокол с полным E2E шифрованием и дополнительной защитой от компрометации отдельных участников группы.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="transparency">
+                                <h3>Прозрачность кода</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Полностью открытый</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">Signal</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 90%"></div>
+                                        </div>
+                                        <span class="bar-value">Открытый</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">Оба проекта полностью открыты с доступным исходным кодом. Obscura дополнительно предлагает Reproducible Builds и формальную верификацию критических компонентов.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="infrastructure">
+                                <h3>Децентрализация</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Полная</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">Signal</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 30%"></div>
+                                        </div>
+                                        <span class="bar-value">Централизация</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">Signal полностью полагается на собственные централизованные серверы, в то время как Obscura использует распределенную архитектуру, что делает его гораздо более устойчивым к атакам на инфраструктуру.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="ai">
+                                <h3>Приватный AI</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Встроенный</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">Signal</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 0%"></div>
+                                        </div>
+                                        <span class="bar-value">Отсутствует</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">Signal не имеет встроенных AI-возможностей, в то время как Obscura предлагает приватного AI-ассистента Алию с фокусом на локальную обработку данных и шифрование.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="competitor-details" data-compare="telegram">
+                            <div class="comparison-detail-item active" data-category="e2e">
+                                <h3>E2E Шифрование</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Везде по умолчанию</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">Telegram</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 30%"></div>
+                                        </div>
+                                        <span class="bar-value">Только Secret Chats</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">Telegram предлагает E2E шифрование только в Secret Chats, в то время как Obscura использует E2E шифрование везде по умолчанию, обеспечивая гораздо более высокий уровень базовой защиты сообщений.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="metadata">
+                                <h3>Защита метаданных</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Полная защита</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">Telegram</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 20%"></div>
+                                        </div>
+                                        <span class="bar-value">Минимальная</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">Telegram сохраняет значительное количество метаданных на своих серверах, тогда как Obscura с Paradise Tree Protocol обеспечивает полную анонимность и защиту всех метаданных.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="groups">
+                                <h3>Защита групповых чатов</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Полное E2E</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">Telegram</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 0%"></div>
+                                        </div>
+                                        <span class="bar-value">Отсутствует</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">Telegram не предлагает E2E шифрования в групповых чатах вообще, сохраняя доступ к содержимому на своих серверах. Obscura шифрует все групповые коммуникации полностью.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="transparency">
+                                <h3>Прозрачность кода</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Полностью открытый</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">Telegram</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 50%"></div>
+                                        </div>
+                                        <span class="bar-value">Частично открытый</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">У Telegram открыт только клиентский код, серверная часть закрыта. Obscura полностью открыт, включая как клиентскую, так и серверную части, с возможностью аудита и проверки всех компонентов.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="infrastructure">
+                                <h3>Децентрализация</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Полная</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">Telegram</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 20%"></div>
+                                        </div>
+                                        <span class="bar-value">Централизованная</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">Telegram использует централизованную модель с серверами, контролируемыми компанией. Obscura строится на распределенной архитектуре, что исключает единую точку отказа.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="ai">
+                                <h3>Приватный AI</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Встроенный</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">Telegram</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 40%"></div>
+                                        </div>
+                                        <span class="bar-value">Боты без приватности</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">Telegram предлагает ботов, но без фокуса на приватность данных. Obscura интегрирует AI-помощника Алию с полной приватностью и локальной обработкой критических данных.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="competitor-details" data-compare="proton">
+                            <div class="comparison-detail-item active" data-category="e2e">
+                                <h3>E2E Шифрование</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Triple-Layer E2E</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">ProtonMail</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 90%"></div>
+                                        </div>
+                                        <span class="bar-value">Надежное E2E</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">ProtonMail обеспечивает высокий уровень шифрования для защиты email коммуникаций. Obscura предлагает сопоставимый уровень шифрования, но с дополнительными слоями защиты и оптимизацией для мгновенных сообщений.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="metadata">
+                                <h3>Защита метаданных</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Paradise Tree Protocol</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">ProtonMail</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 60%"></div>
+                                        </div>
+                                        <span class="bar-value">Базовая защита</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">ProtonMail защищает содержимое писем, но метаданные (отправитель, получатель, время) остаются доступными. Obscura обеспечивает более продвинутую анонимизацию метаданных через распределенную сеть.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="groups">
+                                <h3>Защита групповых чатов</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Полное E2E</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">ProtonMail</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 40%"></div>
+                                        </div>
+                                        <span class="bar-value">Ограниченная</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">Как почтовый сервис, ProtonMail не оптимизирован для групповых чатов. Obscura создана специально для надежно защищенных групповых коммуникаций с E2E шифрованием всех участников.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="transparency">
+                                <h3>Прозрачность кода</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Полностью открытый</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">ProtonMail</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 80%"></div>
+                                        </div>
+                                        <span class="bar-value">В основном открытый</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">ProtonMail имеет открытый исходный код для большинства компонентов. Obscura придерживается полной прозрачности со 100% открытым кодом и воспроизводимыми сборками.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="infrastructure">
+                                <h3>Децентрализация</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Полная</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">ProtonMail</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 30%"></div>
+                                        </div>
+                                        <span class="bar-value">Централизация</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">ProtonMail полагается на централизованные серверы в Швейцарии. Obscura использует распределенную сеть узлов, что исключает зависимость от одной инфраструктуры или юрисдикции.</p>
+                            </div>
+                            
+                            <div class="comparison-detail-item" data-category="ai">
+                                <h3>Приватный AI</h3>
+                                <div class="comparison-bars">
+                                    <div class="bar-item">
+                                        <span class="bar-label">Obscura</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 100%"></div>
+                                        </div>
+                                        <span class="bar-value">Встроенный</span>
+                                    </div>
+                                    <div class="bar-item">
+                                        <span class="bar-label">ProtonMail</span>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: 0%"></div>
+                                        </div>
+                                        <span class="bar-value">Отсутствует</span>
+                                    </div>
+                                </div>
+                                <p class="comparison-text">ProtonMail не предлагает встроенного AI-ассистента. Obscura интегрирует Алию — приватного помощника с локальной обработкой данных, что расширяет функциональность без компромиссов в безопасности.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="parallax-section">
+        <div class="parallax-content">
+            <h2 class="parallax-title">Разговор начинается с доверия</h2>
+            <p class="parallax-text">Obscura — это не просто мессенджер, это платформа общения, где вы сами определяете границы своей приватности</p>
+            <button class="btn btn-outline" style="border-color: white; color: white;">Подробнее о технологиях</button>
+        </div>
+    </section>
+
+    <section class="security" id="security">
+        <div class="container">
+            <h2 class="section-title">Безопасность на высшем уровне</h2>
+            <p class="section-subtitle">Фундаментальная криптография и инновационные подходы к защите ваших данных</p>
+            
+            <div class="security-grid">
+                <!-- Security cards will be generated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <section class="waitlist" id="waitlist">
+        <div class="container">
+            <h2 class="section-title">Присоединяйтесь к Wait List</h2>
+            <p class="section-subtitle">Будьте первыми, кто получит доступ к Obscura, когда мы запустимся</p>
+            
+            <form class="waitlist-form" id="waitlistForm">
+                <div class="form-group">
+                    <label for="name" class="form-label">Ваше имя</label>
+                    <input type="text" id="name" class="form-input" placeholder="Введите ваше имя" required>
+                </div>
+                <div class="form-group">
+                    <label for="email" class="form-label">Email адрес</label>
+                    <input type="email" id="email" class="form-input" placeholder="Введите ваш email" required>
+                </div>
+                <div class="form-group">
+                    <label for="platform" class="form-label">Предпочитаемая платформа</label>
+                    <select id="platform" class="form-input" required>
+                        <option value="" disabled selected>Выберите платформу</option>
+                        <option value="windows">Windows</option>
+                        <option value="macos">macOS</option>
+                        <option value="linux">Linux</option>
+                        <option value="all">Все платформы</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary form-submit">Отправить заявку</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="developers" id="developers">
+        <div class="container developers-container">
+            <div class="developers-image">
+                <div style="background-color: var(--card-bg); border-radius: var(--radius); padding: 30px; box-shadow: 0 20px 40px var(--shadow); position: relative; overflow: hidden;">
+                    <pre style="color: var(--primary); font-family: 'Monaco', monospace; font-size: 0.8rem; overflow-x: auto;">
+<span style="color: var(--text-light);">// Пример плагина для Obscura</span>
+<span style="color: var(--primary-light);">class</span> <span style="color: var(--primary);">TranslatorPlugin</span> {
+    <span style="color: var(--primary-light);">constructor</span>() {
+        <span style="color: var(--text-light);">// Инициализация с минимальными привилегиями</span>
+        this.permissions = [
+            "message:read", 
+            "message:transform"
+        ];
+        this.name = "Translator";
+        this.version = "1.0.0";
+    }
+
+    <span style="color: var(--primary-light);">async</span> <span style="color: var(--primary);">onMessage</span>(message) {
+        <span style="color: var(--text-light);">// Обработка сообщения</span>
+        <span style="color: var(--primary-light);">if</span> (message.hasCommand("/translate")) {
+            <span style="color: var(--primary-light);">const</span> targetLang = message.getCommandParam("lang");
+            <span style="color: var(--primary-light);">const</span> text = message.getCommandParam("text");
+            
+            <span style="color: var(--primary-light);">const</span> result = <span style="color: var(--primary-light);">await</span> this.translate(text, targetLang);
+            
+            <span style="color: var(--primary-light);">return</span> {
+                type: "reply",
+                content: result,
+                metadata: {
+                    originalLang: "auto",
+                    targetLang: targetLang
+                }
+            };
+        }
+        <span style="color: var(--primary-light);">return</span> <span style="color: var(--primary-light);">null</span>;
+    }
+
+    <span style="color: var(--primary-light);">async</span> <span style="color: var(--primary);">translate</span>(text, lang) {
+        <span style="color: var(--text-light);">// Безопасная имплементация перевода</span>
+        <span style="color: var(--primary-light);">return</span> await API.translation.process(text, lang);
+    }
+}
+
+<span style="color: var(--text-light);">// Регистрация плагина с цифровой подписью</span>
+ObscuraPluginRegistry.register(
+    new TranslatorPlugin(),
+    "sig:ed25519:ZXhhbXBsZSBzaWduYXR1cmU="
+);
+                    </pre>
+                </div>
+            </div>
+            <div class="developers-content">
+                <h2 class="developers-title">Разрабатывайте с нами</h2>
+                <p class="developers-text">Мы создаем открытую экосистему, где разработчики могут создавать плагины, расширения и интеграции для Obscura. Наша цель — не деньги, а технологическое развитие.</p>
+                
+                <div class="dev-card">
+                    <h3 class="dev-card-title">Что вы можете создать</h3>
+                    <ul class="security-list">
+                        <li>AI-плагины, расширяющие возможности ассистента Алия</li>
+                        <li>Инструменты безопасности и приватности</li>
+                        <li>Новые способы визуализации и работы с данными</li>
+                        <li>Интеграции с внешними сервисами</li>
+                    </ul>
+                </div>
+                
+                <form class="dev-form" id="devForm">
+                    <div class="form-group">
+                        <label for="devName" class="form-label">Ваше имя</label>
+                        <input type="text" id="devName" class="form-input" placeholder="Введите ваше имя" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="devEmail" class="form-label">Email адрес</label>
+                        <input type="email" id="devEmail" class="form-input" placeholder="Введите ваш email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="devIdea" class="form-label">Опишите вашу идею</label>
+                        <textarea id="devIdea" class="form-input" rows="4" placeholder="Расскажите о вашей идее для разработки" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary form-submit">Отправить предложение</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container footer-container">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <div class="logo-icon"></div>
+                    Obscura
+                </div>
+                <p class="footer-text">Новый стандарт защищённого общения. Объединяем современные криптографические стандарты, искусственный интеллект и приватность.</p>
+                <div class="footer-social">
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-github"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-discord"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-reddit"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Навигация</h4>
+                <ul>
+                    <li><a href="#features">Возможности</a></li>
+                    <li><a href="#security">Безопасность</a></li>
+                    <li><a href="#waitlist">Wait List</a></li>
+                    <li><a href="#developers">Разработчикам</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Ресурсы</h4>
+                <ul>
+                    <li><a href="#">Документация</a></li>
+                    <li><a href="#">API</a></li>
+                    <li><a href="#">Вакансии</a></li>
+                    <li><a href="#">Блог</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-newsletter">
+                <h4>Подпишитесь на новости</h4>
+                <p class="footer-text">Получайте обновления о разработке Obscura и будьте в курсе наших технологических решений</p>
+                <div class="newsletter-form">
+                    <input type="email" class="newsletter-input" placeholder="Ваш email">
+                    <button class="newsletter-btn">→</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container footer-bottom">
+            <p>© 2025 Obscura. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <div class="notification" id="notification">
+        <div class="notification-icon">✓</div>
+        <div class="notification-content">
+            <div class="notification-title">Успешно!</div>
+            <div class="notification-text"></div>
+        </div>
+        <button class="notification-close" id="closeNotification">×</button>
+    </div>
+
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('.theme-toggle-icon');
+        const themeText = themeToggle.querySelector('.theme-text');
+        
+        function setTheme(isDark) {
+            if (isDark) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Тёмная тема';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Светлая тема';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            setTheme(true);
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.hasAttribute('data-theme');
+            setTheme(!isDark);
+        });
+        
+        // AI Response Animation
+        setTimeout(() => {
+            document.getElementById('aiResponse').classList.add('show');
+        }, 3000);
+        
+        // Features Wheel
+        const featureRibbon = document.getElementById('featureRibbon');
+        const features = [
+            {
+                icon: '💬',
+                title: 'Кроссплатформенность',
+                text: 'Работает на Windows, macOS и Linux. Ваши данные всегда с вами, но только вы имеете к ним доступ.'
+            },
+            {
+                icon: '🧠',
+                title: 'AI-помощник Алия',
+                text: 'Встроенный голосовой и текстовый ассистент, работающий на базе новейших моделей ИИ.'
+            },
+            {
+                icon: '🔌',
+                title: 'Плагины и расширения',
+                text: 'Создавайте собственные плагины и делитесь ими через внутренний маркет.'
+            },
+            {
+                icon: '🔐',
+                title: 'OneID',
+                text: 'Инновационная система входа и безопасности, заменяющая пароли безопасными способами входа.'
+            },
+            {
+                icon: '🛡️',
+                title: 'E2E шифрование',
+                text: 'Triple-Layer Encryption на всех уровнях коммуникации с Perfect Forward Secrecy.'
+            },
+            {
+                icon: '👁️',
+                title: 'Защита метаданных',
+                text: 'Paradise Tree Protocol и луковая маршрутизация для защиты от анализа трафика.'
+            }
+        ];
+        
+        function createFeatureCards() {
+            // Clear any existing cards
+            featureRibbon.innerHTML = '';
+            
+            // Triple the features array to create a better continuous loop effect
+            const extendedFeatures = [...features, ...features, ...features];
+            
+            extendedFeatures.forEach((feature, index) => {
+                const card = document.createElement('div');
+                card.className = 'feature-card';
+                
+                card.innerHTML = `
+                    <div class="feature-icon">${feature.icon}</div>
+                    <h3 class="feature-title">${feature.title}</h3>
+                    <p class="feature-text">${feature.text}</p>
+                `;
+                
+                featureRibbon.appendChild(card);
+            });
+            
+            // No ribbon controls as requested (removed pause/play buttons)
+        }
+        
+        createFeatureCards();
+        
+        // Security Cards
+        const securityGrid = document.querySelector('.security-grid');
+        const securityItems = [
+            {
+                icon: '🔒',
+                title: 'Многоуровневое шифрование',
+                items: [
+                    'Triple-Layer Encryption на всех уровнях',
+                    'Curve25519, XSalsa20, Poly1305',
+                    'Perfect Forward Secrecy',
+                    'Готовность к пост-квантовому шифрованию'
+                ]
+            },
+            {
+                icon: '✍️',
+                title: 'Цифровые подписи',
+                items: [
+                    'Все сообщения подписываются через Ed25519',
+                    'Многофакторная верификация собеседников',
+                    'Отсутствие центрального хранилища ключей'
+                ]
+            },
+            {
+                icon: '🕵️',
+                title: 'Защита метаданных',
+                items: [
+                    'Paradise Tree Protocol',
+                    'Луковая маршрутизация (аналог Tor)',
+                    'Защита от анализа трафика'
+                ]
+            },
+            {
+                icon: '💽',
+                title: 'Защита хранимых данных',
+                items: [
+                    'Zero-Knowledge Storage',
+                    'Самоуничтожающиеся сообщения (TTL)',
+                    'Безопасное удаление данных'
+                ]
+            }
+        ];
+        
+        function createSecurityCards() {
+            // Clear any existing cards
+            securityGrid.innerHTML = '';
+            
+            securityItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'security-card';
+                
+                let listItems = '';
+                item.items.forEach(listItem => {
+                    listItems += `<li>${listItem}</li>`;
+                });
+                
+                card.innerHTML = `
+                    <div class="security-icon">${item.icon}</div>
+                    <h3 class="security-title">${item.title}</h3>
+                    <ul class="security-list">
+                        ${listItems}
+                    </ul>
+                `;
+                
+                securityGrid.appendChild(card);
+            });
+        }
+        
+        // Ensure security cards are created
+        createSecurityCards();
+        
+        // Make sure feature cards are created initially
+        createFeatureCards();
+        
+        // Features Tab Controls
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const tabIndicator = document.querySelector('.tab-indicator');
+        
+        // Initialize the tab indicator position
+        function initTabIndicator() {
+            const activeTab = document.querySelector('.tab-btn.active');
+            if (activeTab && tabIndicator) {
+                tabIndicator.style.width = `${activeTab.offsetWidth}px`;
+                tabIndicator.style.left = `${activeTab.offsetLeft}px`;
+            }
+        }
+        
+        initTabIndicator();
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons and content
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to current button and corresponding content
+                btn.classList.add('active');
+                const tabId = btn.getAttribute('data-tab');
+                document.querySelector(`.tab-content[data-tab="${tabId}"]`).classList.add('active');
+                
+                // Update the indicator position
+                tabIndicator.style.width = `${btn.offsetWidth}px`;
+                tabIndicator.style.left = `${btn.offsetLeft}px`;
+            });
+        });
+        
+        // Comparison Controls
+        const comparisonBtns = document.querySelectorAll('.comparison-btn');
+        const compDetailsElements = document.querySelectorAll('.competitor-details');
+        const comparisonIndicator = document.querySelector('.comparison-indicator');
+        const wheelSegments = document.querySelectorAll('.wheel-segment');
+        const detailItems = document.querySelectorAll('.comparison-detail-item');
+        
+        // Initialize the comparison indicator position
+        function initComparisonIndicator() {
+            const activeBtn = document.querySelector('.comparison-btn.active');
+            if (activeBtn && comparisonIndicator) {
+                comparisonIndicator.style.width = `${activeBtn.offsetWidth}px`;
+                comparisonIndicator.style.left = `${activeBtn.offsetLeft}px`;
+            }
+        }
+        
+        initComparisonIndicator();
+        
+        comparisonBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons and competitor details
+                comparisonBtns.forEach(b => b.classList.remove('active'));
+                compDetailsElements.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to current button and corresponding competitor details
+                btn.classList.add('active');
+                const compareId = btn.getAttribute('data-compare');
+                document.querySelector(`.competitor-details[data-compare="${compareId}"]`).classList.add('active');
+                
+                // Update the indicator position
+                comparisonIndicator.style.width = `${btn.offsetWidth}px`;
+                comparisonIndicator.style.left = `${btn.offsetLeft}px`;
+            });
+        });
+        
+        // Wheel segments interaction
+        wheelSegments.forEach(segment => {
+            segment.addEventListener('click', () => {
+                // Remove active class from all segments and detail items
+                wheelSegments.forEach(s => s.classList.remove('active'));
+                detailItems.forEach(d => d.classList.remove('active'));
+                
+                // Add active class to current segment and corresponding detail item
+                segment.classList.add('active');
+                
+                // Find the active competitor details
+                const activeCompDetails = document.querySelector('.competitor-details.active');
+                if (activeCompDetails) {
+                    const category = segment.getAttribute('data-category');
+                    const detailItem = activeCompDetails.querySelector(`.comparison-detail-item[data-category="${category}"]`);
+                    if (detailItem) {
+                        detailItem.classList.add('active');
+                    }
+                }
+                
+                // Rotate the wheel to center the active segment
+                const index = Array.from(wheelSegments).indexOf(segment);
+                const angle = -index * 60; // 60 degrees per segment for 6 segments
+                document.querySelector('.wheel-segments').style.transform = `rotate(${angle}deg)`;
+            });
+        });
+        
+        // Initialize the wheel with the first segment active
+        if (wheelSegments.length > 0) {
+            wheelSegments[0].click();
+        }
+        
+        // Window resize adjustments
+        window.addEventListener('resize', () => {
+            initTabIndicator();
+            initComparisonIndicator();
+        });
+        
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Learn More Button
+        document.getElementById('learnMoreBtn').addEventListener('click', () => {
+            window.scrollTo({
+                top: document.getElementById('features').offsetTop - 80,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Waitlist Button
+        document.getElementById('waitlistBtn').addEventListener('click', () => {
+            window.scrollTo({
+                top: document.getElementById('waitlist').offsetTop - 80,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Notification System
+        const notification = document.getElementById('notification');
+        const notificationText = notification.querySelector('.notification-text');
+        const closeNotification = document.getElementById('closeNotification');
+        
+        function showNotification(message, success = true) {
+            const notificationIcon = notification.querySelector('.notification-icon');
+            const notificationTitle = notification.querySelector('.notification-title');
+            
+            if (success) {
+                notification.style.borderLeftColor = 'var(--success)';
+                notificationIcon.style.backgroundColor = 'rgba(56, 161, 105, 0.1)';
+                notificationIcon.style.color = 'var(--success)';
+                notificationIcon.textContent = '✓';
+                notificationTitle.textContent = 'Успешно!';
+            } else {
+                notification.style.borderLeftColor = 'var(--error)';
+                notificationIcon.style.backgroundColor = 'rgba(229, 62, 62, 0.1)';
+                notificationIcon.style.color = 'var(--error)';
+                notificationIcon.textContent = '!';
+                notificationTitle.textContent = 'Ошибка!';
+            }
+            
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+        
+        closeNotification.addEventListener('click', () => {
+            notification.classList.remove('show');
+        });
+        
+        // Form Submissions
+        const waitlistForm = document.getElementById('waitlistForm');
+        const devForm = document.getElementById('devForm');
+        
+        waitlistForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // In a real implementation, you would send this data to your server
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                platform: document.getElementById('platform').value
+            };
+            
+            // Simulate form submission
+            setTimeout(() => {
+                showNotification('Вы успешно добавлены в список ожидания!');
+                waitlistForm.reset();
+                // Here you would normally send the data to your backend
+                console.log('Waitlist form data:', formData);
+                localStorage.setItem('waitlistSubmission', JSON.stringify(formData));
+            }, 1000);
+        });
+        
+        devForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // In a real implementation, you would send this data to your server
+            const formData = {
+                name: document.getElementById('devName').value,
+                email: document.getElementById('devEmail').value,
+                idea: document.getElementById('devIdea').value
+            };
+            
+            // Simulate form submission
+            setTimeout(() => {
+                showNotification('Ваше предложение успешно отправлено!');
+                devForm.reset();
+                // Here you would normally send the data to your backend
+                console.log('Developer form data:', formData);
+                localStorage.setItem('devSubmission', JSON.stringify(formData));
+            }, 1000);
+        });
+        
+        // Parallax Effect
+        window.addEventListener('scroll', () => {
+            const scrollPosition = window.scrollY;
+            
+            // Add parallax effects to various elements
+            document.querySelectorAll('.parallax-section').forEach(section => {
+                const yPos = -(scrollPosition - section.offsetTop) * 0.2;
+                section.style.backgroundPosition = `center ${yPos}px`;
+            });
+            
+            // Animate sections on scroll
+            document.querySelectorAll('section').forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (sectionTop < windowHeight * 0.75) {
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                }
+            });
+        });
+        
+        // Initialize sections with opacity 0 and translate up
+        document.querySelectorAll('section:not(.hero)').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        });
+        
+        // Trigger initial scroll check
+        window.dispatchEvent(new Event('scroll'));
+    </script>
+</body>
+</html>
