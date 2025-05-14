@@ -2154,6 +2154,34 @@
         }
 
         /* Mobile Responsiveness */
+        @media (max-width: 1200px) {
+            .container {
+                padding: 0 30px;
+            }
+            
+            .hero-title {
+                font-size: 3rem;
+            }
+            
+            .parallax-section {
+                height: 350px;
+            }
+            
+            .comparison-wheel-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .comparison-wheel {
+                margin-bottom: 40px;
+            }
+            
+            .comparison-details {
+                margin-left: 0;
+                max-width: 100%;
+            }
+        }
+
         @media (max-width: 992px) {
             .hero-image {
                 display: none;
@@ -2161,6 +2189,13 @@
             
             .hero-content {
                 max-width: 100%;
+                padding: 40px 0;
+            }
+            
+            .hero::before {
+                width: 100%;
+                right: 0;
+                top: -20%;
             }
             
             .wheel-container {
@@ -2185,38 +2220,105 @@
                 transform: none !important;
             }
             
+            .feature-ribbon {
+                width: calc(300% + 500px);
+            }
+            
             .developers-container {
                 grid-template-columns: 1fr;
             }
             
             .developers-image {
                 order: 2;
+                margin-top: 30px;
             }
             
             .developers-content {
                 order: 1;
             }
+            
+            .comparison-wheel {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .wheel-center {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .tab-controls {
+                overflow-x: auto;
+                justify-content: flex-start;
+                padding-bottom: 10px;
+            }
+            
+            .tab-btn {
+                white-space: nowrap;
+                padding: 10px 18px;
+                font-size: 1rem;
+            }
+            
+            .comparison-controls {
+                overflow-x: auto;
+                justify-content: flex-start;
+                padding-bottom: 10px;
+            }
+            
+            .comparison-btn {
+                white-space: nowrap;
+                padding: 10px 18px;
+            }
         }
 
         @media (max-width: 768px) {
+            .header-container {
+                padding: 10px 0;
+            }
+            
+            .hero {
+                padding-top: 100px;
+            }
+            
             .hero-title {
                 font-size: 2.5rem;
+                margin-bottom: 12px;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 24px;
             }
             
             .section-title {
                 font-size: 2rem;
             }
             
+            .section-subtitle {
+                font-size: 1rem;
+                margin-bottom: 2rem;
+            }
+            
             .parallax-title {
                 font-size: 2.2rem;
             }
             
+            .parallax-text {
+                font-size: 1.1rem;
+            }
+            
             .cta-group {
                 flex-direction: column;
+                gap: 12px;
+            }
+            
+            .btn {
+                width: 100%;
             }
             
             .security-grid {
                 grid-template-columns: 1fr;
+                gap: 20px;
             }
             
             .waitlist-form {
@@ -2225,12 +2327,64 @@
             
             .footer-container {
                 grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .feature-card {
+                min-width: 250px;
+                height: auto;
+                min-height: 200px;
+            }
+            
+            .feature-ribbon {
+                padding: 15px 0;
+            }
+            
+            .tab-feature {
+                padding: 20px;
+            }
+            
+            section {
+                padding: 70px 0;
+            }
+            
+            .tab-grid, 
+            .comparison-container {
+                margin-top: 30px;
+            }
+            
+            /* Tab content adjustments */
+            .tab-content-container {
+                min-height: 400px;
+            }
+            
+            /* Form adjustments */
+            .form-input, 
+            .newsletter-form {
+                font-size: 0.9rem;
+            }
+            
+            .form-submit {
+                padding: 12px;
             }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 600px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .logo-icon {
+                width: 28px;
+                height: 28px;
+            }
+            
             .hero-title {
-                font-size: 2rem;
+                font-size: 2.2rem;
             }
             
             .hero-subtitle {
@@ -2238,17 +2392,271 @@
             }
             
             .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .comparison-wheel {
+                width: 220px;
+                height: 220px;
+            }
+            
+            .wheel-center {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .segment-content h4 {
+                font-size: 0.75rem;
+            }
+            
+            .bar-label {
+                width: 80px;
+            }
+            
+            .bar-value {
+                width: 90px;
+                font-size: 0.8rem;
+            }
+            
+            .feature-ribbon {
+                width: calc(400% + 500px);
+            }
+            
+            .parallax-section {
+                height: 300px;
+            }
+            
+            .parallax-title {
+                font-size: 2rem;
+            }
+            
+            .parallax-text {
+                font-size: 1rem;
+            }
+            
+            .feature-icon {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .security-card, 
+            .tab-feature {
+                padding: 20px 15px;
+            }
+            
+            .feature-title, 
+            .security-title {
+                font-size: 1.2rem;
+            }
+            
+            .feature-text, 
+            .security-list li {
+                font-size: 0.9rem;
+            }
+            
+            .social-icon {
+                width: 35px;
+                height: 35px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-container {
+                padding: 5px 0;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 0.95rem;
+            }
+            
+            .section-title {
                 font-size: 1.7rem;
+            }
+            
+            .section-subtitle {
+                font-size: 0.9rem;
             }
             
             .parallax-title {
                 font-size: 1.8rem;
             }
             
+            .parallax-text {
+                font-size: 0.95rem;
+                margin-bottom: 1.5rem;
+            }
+            
             .notification {
-                left: 20px;
-                right: 20px;
+                left: 15px;
+                right: 15px;
                 max-width: none;
+                padding: 12px 15px;
+            }
+            
+            .comparison-wheel {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .wheel-center {
+                width: 60px;
+                height: 60px;
+                font-size: 0.8rem;
+            }
+            
+            .wheel-logo .logo-icon {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .feature-icon-wrapper {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .tab-grid {
+                gap: 15px;
+            }
+            
+            .security-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+            
+            .tab-controls, 
+            .comparison-controls {
+                margin-bottom: 25px;
+            }
+            
+            .tab-btn, 
+            .comparison-btn {
+                padding: 8px 14px;
+                font-size: 0.9rem;
+            }
+            
+            .waitlist-form,
+            .dev-form {
+                padding: 20px 15px;
+            }
+            
+            .form-label {
+                font-size: 0.9rem;
+            }
+            
+            .form-input {
+                padding: 10px 14px;
+            }
+            
+            .footer-text,
+            .footer-links a {
+                font-size: 0.9rem;
+            }
+            
+            .footer-logo {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .logo {
+                font-size: 1.3rem;
+            }
+            
+            .logo-icon {
+                width: 24px;
+                height: 24px;
+                margin-right: 8px;
+            }
+            
+            .theme-toggle {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .comparison-wheel {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .wheel-center {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .segment-content {
+                width: 70px;
+            }
+            
+            .segment-content h4 {
+                font-size: 0.7rem;
+            }
+            
+            .feature-card {
+                min-width: 220px;
+                padding: 20px 15px;
+            }
+            
+            .feature-title {
+                font-size: 1.1rem;
+            }
+            
+            .feature-text {
+                font-size: 0.85rem;
+            }
+            
+            .security-title,
+            .tab-feature h3 {
+                font-size: 1.1rem;
+            }
+            
+            .security-list li,
+            .tab-feature p {
+                font-size: 0.85rem;
+            }
+            
+            .notification-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 1rem;
+            }
+            
+            .notification-title {
+                font-size: 0.9rem;
+            }
+            
+            .notification-text {
+                font-size: 0.8rem;
+            }
+            
+            .footer-social {
+                gap: 10px;
+            }
+            
+            .social-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+            
+            .footer-bottom {
+                font-size: 0.8rem;
             }
         }
     </style>
